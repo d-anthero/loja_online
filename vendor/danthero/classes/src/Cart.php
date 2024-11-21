@@ -72,12 +72,20 @@ class Cart extends Model {
     public function save()
     {
         $sql = new Sql();
-
-        $results = $sql->select("INSERT INTO carts (sessionid) VALUES (:SESSIONID)", [
+    
+        $sql->query("INSERT INTO carts (sessionid) VALUES (:SESSIONID)", [
             ':SESSIONID' => $this->getsessionid()
         ]);
-    }
+    
+        $results = $sql->select("SELECT last_insert_rowid() AS id");
+        
+        if (isset($results[0]['id'])) {
+            $this->setidcart($results[0]['id']);
+        } else {
+            throw new Exception("Falhou em recuperar o id.");
+        }
 
+    }
     public function addProduct(Products $product)
 	{
 
@@ -90,16 +98,15 @@ class Cart extends Model {
 
 	}
 
-    public function removeProduct(int $idcart_product)
+    public function removeProduct($idproduct)
     {
         $sql = new Sql();
 
-        $sql->query("DELETE FROM cart_products WHERE idcart = :idcart AND idcart_product = :idcart_product", [
+        $sql->query("DELETE FROM cart_products WHERE idcart = :idcart AND idproduct = :idproduct", [
             ':idcart' => $this->getidcart(),
-            ':idcart_product' => $idproduct
+            ':idproduct' => $idproduct
         ]);
     }
-
 
     public function getProducts()
     {

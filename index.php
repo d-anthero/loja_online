@@ -95,7 +95,7 @@ $app->get("/cart/:id/minus", function($id){
     $product = new Products();
     $product->get((int)$id);
     $cart = Cart::getFromSession();
-    $cart->removeProduct($product);
+    $cart->removeProduct($id);
 
     header("Location: /product/cart");
     exit;
