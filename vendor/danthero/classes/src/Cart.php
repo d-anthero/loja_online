@@ -16,14 +16,13 @@ class Cart extends Model {
  
 
         $cart = new Cart();
-
-        // Check if the cart exists in the session
+ 
         if (isset($_SESSION[Cart::SESSION]) && (int)$_SESSION[Cart::SESSION]['idcart'] > 0) {
             $cart->get((int)$_SESSION[Cart::SESSION]['idcart']);
         } else {
             $cart->getFromSessionID();
 
-            // If no cart exists, create a new one
+ 
             if (!(int)$cart->getidcart() > 0) {
                 $data = [
                     'sessionid' => session_id()
@@ -86,23 +85,89 @@ class Cart extends Model {
         }
 
     }
-    public function addProduct(Products $product)
-	{
 
-		$sql = new Sql();
-
-		$sql->query("INSERT INTO cart_products (idcart, idproduct) VALUES(:idcart, :idproduct)", [
-			':idcart' => $this->getidcart(),
-			':idproduct' => $product->getid()
-		]);
-
-	}
-
-    public function removeProduct($idproduct)
+    public function addProduct(Products $product, int $quantity = 1)
     {
         $sql = new Sql();
 
-        $sql->query("DELETE FROM cart_products WHERE idcart = :idcart AND idproduct = :idproduct", [
+        $idproduct = $product->getid();
+        $price = $product->getprice();
+
+ 
+        $results = $sql->select("SELECT * FROM cart_products WHERE idcart = :idcart AND idproduct = :idproduct", [
+            ':idcart' => $this->getidcart(),
+            ':idproduct' => $idproduct
+        ]);
+
+        if (count($results) > 0) {
+ 
+            $sql->query("
+                UPDATE cart_products 
+                SET quantity = quantity + :quantity, price = price + :price 
+                WHERE idcart = :idcart AND idproduct = :idproduct", [
+                ':quantity' => $quantity,
+                ':price' => $price * $quantity,  
+                ':idcart' => $this->getidcart(),
+                ':idproduct' => $idproduct
+            ]);
+        } else {
+ 
+            $sql->query("
+                INSERT INTO cart_products (idcart, idproduct, quantity, price) 
+                VALUES (:idcart, :idproduct, :quantity, :price)", [
+                ':idcart' => $this->getidcart(),
+                ':idproduct' => $idproduct,
+                ':quantity' => $quantity,
+                ':price' => $price * $quantity  
+            ]);
+        }
+    }
+
+    public function removeProduct(int $idproduct)
+    {
+        $sql = new Sql();
+
+        $results = $sql->select("
+            SELECT quantity, price 
+            FROM cart_products 
+            WHERE idcart = :idcart AND idproduct = :idproduct", [
+            ':idcart' => $this->getidcart(),
+            ':idproduct' => $idproduct
+        ]);
+
+        if (count($results) > 0) {
+            $current = $results[0];
+            $currentQuantity = $current['quantity'];
+            $currentPrice = $current['price'];
+
+            if ($currentQuantity > 1) {
+                $newQuantity = $currentQuantity - 1;
+                $newPrice = $currentPrice - ($currentPrice / $currentQuantity);
+
+                $sql->query("
+                    UPDATE cart_products 
+                    SET quantity = :quantity, price = :price 
+                    WHERE idcart = :idcart AND idproduct = :idproduct", [
+                    ':quantity' => $newQuantity,
+                    ':price' => $newPrice,
+                    ':idcart' => $this->getidcart(),
+                    ':idproduct' => $idproduct
+                ]);
+            } else {
+                $this->removeProductCompletely($idproduct);
+            }
+        }
+    }
+
+    public function removeProductCompletely($idproduct)
+    {
+        $sql = new Sql();
+
+        var_dump($idproduct);
+        
+        $sql->query("
+            DELETE FROM cart_products 
+            WHERE idcart = :idcart AND idproduct = :idproduct", [
             ':idcart' => $this->getidcart(),
             ':idproduct' => $idproduct
         ]);
@@ -111,14 +176,19 @@ class Cart extends Model {
     public function getProducts()
     {
         $sql = new Sql();
-
+    
         $results = $sql->select("
             SELECT 
                 p.id,
                 p.name,
                 p.description,
                 p.price,
-                cp.idcart_product
+                cp.idcart_product,
+                cp.quantity,
+                cp.price AS subtotal_price,
+                (SELECT SUM(cp_inner.price) 
+                 FROM cart_products cp_inner 
+                 WHERE cp_inner.idcart = :idcart) AS total_cart_price
             FROM 
                 cart_products cp
             JOIN 
@@ -128,9 +198,11 @@ class Cart extends Model {
         ", [
             ':idcart' => $this->getidcart()
         ]);
-
+    
         return $results;
     }
+
+
 }
     
 

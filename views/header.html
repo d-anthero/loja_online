@@ -10,5 +10,6 @@
     <div class="container-md">
         <a class="navbar-brand" href="/index.php">Loja Online</a>
         <a class="navbar-brand" href="/product/cart">Carrinho</a>
+
     </div>
 </nav>
