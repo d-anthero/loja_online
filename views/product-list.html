@@ -1,0 +1,42 @@
+<body>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Lista de Produtos
+                    <a href="/product/create" class="btn btn-primary float-end">Adicionar produto</a>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Preço</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loop="$products"}
+                            <tr>
+                                <td>{$value.id}</td>
+                                <td>{$value.name}</td>
+                                <td>{$value.description}</td>
+                                <td>R${$value.price}</td>
+                                <td>
+                                    <a href="/cart/{$value.id}/add" class="btn btn-success btn-sm">Adicionar ao carrinho</a>
+                                    <a href="/product/update/{$value.id}" class="btn btn-secondary btn-sm">Editar</a>
+                                    <a href="/product/{$value.id}/delete" onclick="confirm('Deseja realmente excluir esse produto?')" class="btn btn-danger btn-sm">Excluir</a>
+                                    </form>
+                                </td>
+                            </tr>
+                            {/loop}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
