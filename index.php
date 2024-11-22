@@ -91,25 +91,37 @@ $app->get("/cart/:id/add", function($id){
     exit;
 });
 
-$app->get("/cart/:id/minus", function($id){
-    $product = new Products();
-    $product->get((int)$id);
-    $cart = Cart::getFromSession();
-    $cart->removeProduct($product);
-
-    header("Location: /product/cart");
-    exit;
-});
-
 $app->get("/cart/:id/remove", function($id){
     $product = new Products();
     $product->get((int)$id);
     $cart = Cart::getFromSession();
-    $cart->removeProduct($product, true);
+    $cart->removeProductCompletely($id);
 
     header("Location: /product/cart");
     exit;
 });
+
+$app->get("/cart/:id/minus", function($id){
+    $product = new Products();
+    $product->get((int)$id);
+    $cart = Cart::getFromSession();
+    $cart->removeProduct($id);
+
+    header("Location: /product/cart");
+    exit;
+});
+
+$app->get("/cart/:id/addFromCart", function($id){
+    $product = new Products();
+    $product->get((int)$id);
+    $cart = Cart::getFromSession();
+    $cart->addProduct($product);
+
+    header("Location: /product/cart");
+    exit;
+});
+
+
 
 $app->run();
 
