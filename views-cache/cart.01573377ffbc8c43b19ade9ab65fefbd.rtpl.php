@@ -37,17 +37,16 @@
           </div>
           <?php } ?>  
 
-          <?php $counter1=-1;  if( isset($products) && ( is_array($products) || $products instanceof Traversable ) && sizeof($products) ) foreach( $products as $key1 => $value1 ){ $counter1++; ?>
+
           <div class="card">
             <div style="display: flex; justify-content:space-between" class="card-body">
               <button type="button" data-mdb-button-init="" data-mdb-ripple-init="" class="btn btn-warning btn-block btn-lg">Pagar</button>
               <div>
-                <span>            <p>Total: <b>R$<?php echo htmlspecialchars( $value1["total_cart_price"], ENT_COMPAT, 'UTF-8', FALSE ); ?></b></p></span>
+                <span>            <p>Total: <b>R$<?php echo htmlspecialchars( $total_cart_price, ENT_COMPAT, 'UTF-8', FALSE ); ?></b></p></span>
               </div>
             </div>
           </div>
-          <?php } ?>
-  
+ 
         </div>
       </div>
     </div>

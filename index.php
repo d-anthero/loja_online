@@ -76,9 +76,11 @@ $app->post("/product/update/:id", function($id){
 $app->get("/product/cart", function(){
     $cart = Cart::getFromSession();
     $page = new Page();
-
+    $products = $cart->getProducts();
+    $totalCartPrice = count($products) > 0 ? $products[0]['total_cart_price'] : 0;
     $page->setTpl("cart", [ 'cart' => $cart->getValues(),
-'products' => $cart->getProducts() ]);
+'products' => $products,
+'total_cart_price' => $totalCartPrice ]);
 });
 
 $app->get("/cart/:id/add", function($id){

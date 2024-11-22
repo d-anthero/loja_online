@@ -37,17 +37,16 @@
           </div>
           {/loop}  
 
-          {loop="$products"}
+
           <div class="card">
             <div style="display: flex; justify-content:space-between" class="card-body">
               <button type="button" data-mdb-button-init="" data-mdb-ripple-init="" class="btn btn-warning btn-block btn-lg">Pagar</button>
               <div>
-                <span>            <p>Total: <b>R${$value.total_cart_price}</b></p></span>
+                <span>            <p>Total: <b>R${$total_cart_price}</b></p></span>
               </div>
             </div>
           </div>
-          {/loop}
-  
+ 
         </div>
       </div>
     </div>
